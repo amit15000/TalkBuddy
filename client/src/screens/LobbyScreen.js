@@ -1,14 +1,24 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useSocket } from "../context/SocketProvider";
 
 function LobbyScreen() {
   const [email, setEmail] = useState("");
   const [room, setRoom] = useState("");
 
+  const socket = useSocket();
+  console.log(socket);
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleSubmitForm = useCallback((e) => {
-    e.preventDefault();
-    console.log(email, room);
-  });
+  const handleSubmitForm = useCallback(
+    (e) => {
+      e.preventDefault();
+      socket.emit("room:join", { email, room });
+
+      console.log(email, room);
+    },
+    [email, room, socket]
+  );
+  useEffect(() => {});
   return (
     <div>
       <div>Lobby</div>
