@@ -1,13 +1,18 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 
 function LobbyScreen() {
   const [email, setEmail] = useState("");
   const [room, setRoom] = useState("");
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleSubmitForm = useCallback((e) => {
+    e.preventDefault();
+    console.log(email, room);
+  });
   return (
     <div>
       <div>Lobby</div>
-      <form>
+      <form onSubmit={handleSubmitForm}>
         <label htmlFor="email">Email ID</label>
         <input
           type="email"
@@ -22,6 +27,7 @@ function LobbyScreen() {
           value={room}
           onChange={(e) => setRoom(e.target.value)}
         />
+        <button>Join</button>
       </form>
     </div>
   );
