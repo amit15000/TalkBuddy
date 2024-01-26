@@ -29,9 +29,17 @@ function Room() {
 
   const sendStreams = useCallback(() => {
     for (const track of myStream.getTracks()) {
-      peer.peer.addTrack(track, myStream);
+      // Check if a sender already exists for this track
+      const existingSender = peer.peer
+        .getSenders()
+        .find((sender) => sender.track === track);
+
+      if (!existingSender) {
+        peer.peer.addTrack(track, myStream);
+      }
     }
   }, [myStream]);
+
   const handleCallAccepted = useCallback(
     (form, ans) => {
       peer.setLocalDescription(ans);
@@ -53,8 +61,8 @@ function Room() {
     };
   }, [handleNegoNeeded]);
   const handleNegoNeedIncoming = useCallback(
-    ({ from, offer }) => {
-      const ans = peer.getAnswer(offer);
+    async ({ from, offer }) => {
+      const ans = await peer.getAnswer(offer);
       socket.emit("peer:nego:done", { to: from, ans });
     },
     [socket]
@@ -68,7 +76,7 @@ function Room() {
     peer.peer.addEventListener("track", async (ev) => {
       const remoteStream = ev.streams;
       console.log("Got Tracks");
-      setRemoteStream(remoteStream);
+      setRemoteStream(remoteStream[0]);
     });
   }, []);
 
@@ -116,7 +124,7 @@ function Room() {
             playing
             muted
             width="300px"
-            height="500px"
+            height="300px"
             url={myStream}
           ></ReactPlayer>
         </>
@@ -128,7 +136,7 @@ function Room() {
             playing
             muted
             width="300px"
-            height="500px"
+            height="300px"
             url={remoteStream}
           ></ReactPlayer>
         </>
